@@ -1,13 +1,14 @@
-import { load, last, first, previous, next } from './gallery';
+import { load, last, first, previous, next, getNextPhoto, getPreviousPhoto } from './gallery';
 import { display_galerie } from './gallery_ui';
 import { loadPicture, loadRessource } from './photoloader';
-import { Categorie, Photo } from './types';
+import { Photo } from './types';
 import { displayCategorie, displayComments, displayPicture } from './ui';
 
 const btnNext = document.getElementById('btn-next') as HTMLButtonElement;
 const btnPrevious = document.getElementById('btn-prev') as HTMLButtonElement;
 const btnFirst = document.getElementById('btn-first') as HTMLButtonElement;
 const btnLast = document.getElementById('btn-last') as HTMLButtonElement;
+const btnLoad = document.getElementById('btn-load') as HTMLButtonElement;
 
 if (btnNext) {
     btnNext.addEventListener('click', () => {
@@ -38,6 +39,35 @@ function getPicture(id: number): void {
         .then((data: Photo) => {
             displayPicture(data);
 
+            const sectionGalerie = document.getElementById('la_galerie') as HTMLElement;
+            const sectionPhoto = document.getElementById('la_photo') as HTMLElement;
+            const navigationButtons = document.getElementById('navigation') as HTMLElement;
+
+            if (sectionGalerie) sectionGalerie.style.display = 'none';
+            if (sectionPhoto) sectionPhoto.style.display = 'block';
+            if (navigationButtons) navigationButtons.style.display = 'none';
+
+            document.getElementById('close-lightbox')?.addEventListener('click', () => {
+                if (sectionGalerie) sectionGalerie.style.display = 'block';
+                if (sectionPhoto) sectionPhoto.style.display = 'none';
+                if (navigationButtons) navigationButtons.style.display = 'block';
+            }
+            );
+
+            document.getElementById('next-lightbox')?.addEventListener('click', () => {
+                const nextId = getNextPhoto(data.photo.id);
+                if (nextId !== null) {
+                    getPicture(nextId);
+                }
+            });
+
+            document.getElementById('prev-lightbox')?.addEventListener('click', () => {
+                const prevId = getPreviousPhoto(data.photo.id);
+                if (prevId !== null) {
+                    getPicture(prevId);
+                }
+            });
+
             getCategorie(data)
                 .then((cat: any) => {
                     displayCategorie(cat);
@@ -62,7 +92,6 @@ function getComments(data: Photo): Promise<any> {
     return loadRessource(uri);
 }
 
-const btnLoad = document.getElementById('btn-load') as HTMLButtonElement;
 btnLoad.addEventListener('click', () => {
     load().then((galerie: any) => display_galerie(galerie, getPicture));
 });

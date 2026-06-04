@@ -1,6 +1,6 @@
 import { loadPicture, loadRessource } from './photoloader';
 
-let listPhotos = null;
+let listPhotos: any = null;
 let navigation: any = {};
 
 export function loadPage(uri: string): Promise<any> {
@@ -42,4 +42,22 @@ export function last(): Promise<any> {
         return loadPage(navigation.last.href);
     }
     return Promise.reject(new Error("No last page available"));
+}
+
+export function getNextPhoto(id: number): number | null {
+    if(!listPhotos) return null;
+    const index = listPhotos.findIndex((photo: any) => photo.photo.id === id);
+    if (index !== -1 && index < listPhotos.length - 1) {
+        return listPhotos[index + 1].photo.id;
+    }
+    return null;
+}
+
+export function getPreviousPhoto(id: number): number | null {
+    if(!listPhotos) return null;
+    const index = listPhotos.findIndex((photo: any) => photo.photo.id === id);
+    if (index > 0) {
+        return listPhotos[index - 1].photo.id;
+    }
+    return null;
 }

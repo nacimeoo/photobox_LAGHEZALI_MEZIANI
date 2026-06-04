@@ -24,19 +24,25 @@
 	</main>
 
 	<script id="photoTemplate" type="text/x-handlebars-template">
-	<img src="{{url}}" alt="{{title}}">
-	<h4>{{title}}</h4>
-	<p>{{description}}</p>
-	<p>{{type}}, {{defX}} x {{defY}}</p>
-	<h4 id="la_categorie">categorie : {{category}}</h4>
-	<h4>commentaires : </h4>
-	<ul id="les_commentaires">
-	{{#each comments}}
-		<li>{{pseudo}} : {{comment}}</li>
-	{{/each}}
-	</ul>
+		<div id="lightbox" style="margin-bottom: 20px; text-align: center;">
+			<button id="close-lightbox">Fermer</button>
+			<button id="prev-lightbox">Previous</button>
+			<button id="next-lightbox">Next</button>
+		</div>
 
-</script>
+		<img src="{{url}}" alt="{{title}}" style="max-width: 100%; height: auto;">
+		<h4>{{title}}</h4>
+		<p>{{description}}</p>
+		<p>{{type}}, {{defX}} x {{defY}}</p>
+		<h4 id="la_categorie">categorie : {{category}}</h4>
+		<h4>commentaires : </h4>
+		<ul id="les_commentaires">
+		{{#each comments}}
+			<li>{{pseudo}} : {{comment}}</li>
+		{{/each}}
+		</ul>
+
+	</script>
 
 	<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 	<script src='js/index.js' defer></script>

@@ -5830,12 +5830,38 @@
     }
     return Promise.reject(new Error("No last page available"));
   }
+  function getNextPhoto(id2) {
+    if (!listPhotos)
+      return null;
+    const index = listPhotos.findIndex((photo) => photo.photo.id === id2);
+    if (index !== -1 && index < listPhotos.length - 1) {
+      return listPhotos[index + 1].photo.id;
+    }
+    return null;
+  }
+  function getPreviousPhoto(id2) {
+    if (!listPhotos)
+      return null;
+    const index = listPhotos.findIndex((photo) => photo.photo.id === id2);
+    if (index > 0) {
+      return listPhotos[index - 1].photo.id;
+    }
+    return null;
+  }
 
   // ts/module/gallery_ui.ts
   var BASE_URL = "https://webetu.iutnc.univ-lorraine.fr";
   function display_galerie(galerie, onphotoClick) {
-    const section = document.getElementById("la_galerie");
-    section.innerHTML = "";
+    const sectionGalerie = document.getElementById("la_galerie");
+    const sectionPhoto = document.getElementById("la_photo");
+    const navigationButtons = document.getElementById("navigation");
+    if (sectionGalerie)
+      sectionGalerie.style.display = "block";
+    if (sectionPhoto)
+      sectionPhoto.style.display = "none";
+    if (navigationButtons)
+      navigationButtons.style.display = "block";
+    sectionGalerie.innerHTML = "";
     galerie.forEach((photo) => {
       const img = document.createElement("img");
       img.src = `${BASE_URL}${photo.photo.thumbnail.href}`;
@@ -5843,7 +5869,7 @@
       img.addEventListener("click", () => {
         onphotoClick(photo.photo.id);
       });
-      section.appendChild(img);
+      sectionGalerie.appendChild(img);
     });
   }
 
@@ -5883,6 +5909,7 @@
   var btnPrevious = document.getElementById("btn-prev");
   var btnFirst = document.getElementById("btn-first");
   var btnLast = document.getElementById("btn-last");
+  var btnLoad = document.getElementById("btn-load");
   if (btnNext) {
     btnNext.addEventListener("click", () => {
       next().then((galerie) => display_galerie(galerie, getPicture));
@@ -5906,6 +5933,38 @@
   function getPicture(id2) {
     loadPicture(id2).then((data) => {
       displayPicture(data);
+      const sectionGalerie = document.getElementById("la_galerie");
+      const sectionPhoto = document.getElementById("la_photo");
+      const navigationButtons = document.getElementById("navigation");
+      if (sectionGalerie)
+        sectionGalerie.style.display = "none";
+      if (sectionPhoto)
+        sectionPhoto.style.display = "block";
+      if (navigationButtons)
+        navigationButtons.style.display = "none";
+      document.getElementById("close-lightbox")?.addEventListener(
+        "click",
+        () => {
+          if (sectionGalerie)
+            sectionGalerie.style.display = "block";
+          if (sectionPhoto)
+            sectionPhoto.style.display = "none";
+          if (navigationButtons)
+            navigationButtons.style.display = "block";
+        }
+      );
+      document.getElementById("next-lightbox")?.addEventListener("click", () => {
+        const nextId = getNextPhoto(data.photo.id);
+        if (nextId !== null) {
+          getPicture(nextId);
+        }
+      });
+      document.getElementById("prev-lightbox")?.addEventListener("click", () => {
+        const prevId = getPreviousPhoto(data.photo.id);
+        if (prevId !== null) {
+          getPicture(prevId);
+        }
+      });
       getCategorie(data).then((cat) => {
         displayCategorie(cat);
       });
@@ -5922,7 +5981,6 @@
     const uri = data.links.comments.href;
     return loadRessource(uri);
   }
-  var btnLoad = document.getElementById("btn-load");
   btnLoad.addEventListener("click", () => {
     load().then((galerie) => display_galerie(galerie, getPicture));
   });
