@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "esbuild": "^0.17.18",
+    "handlebars": "^4.7.9"
+  },
+  "scripts": {
+    "build": "esbuild ts/index.ts --bundle --sourcemap --target=es2015 --outfile=js/index.js"
+  },
+  "devDependencies": {
+    "@types/handlebars": "^4.0.40"
+  }
+}
