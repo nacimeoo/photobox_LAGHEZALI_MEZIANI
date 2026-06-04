@@ -235,12 +235,12 @@
           if (options.data) {
             data = _utils.createFrame(options.data);
           }
-          function execIteration(field, index, last) {
+          function execIteration(field, index, last2) {
             if (data) {
               data.key = field;
               data.index = index;
               data.first = index === 0;
-              data.last = !!last;
+              data.last = !!last2;
               if (contextPath) {
                 data.contextPath = contextPath + field;
               }
@@ -1644,18 +1644,18 @@
               return (past.length > 20 ? "..." : "") + past.substr(-20).replace(/\n/g, "");
             },
             upcomingInput: function upcomingInput() {
-              var next = this.match;
-              if (next.length < 20) {
-                next += this._input.substr(0, 20 - next.length);
+              var next2 = this.match;
+              if (next2.length < 20) {
+                next2 += this._input.substr(0, 20 - next2.length);
               }
-              return (next.substr(0, 20) + (next.length > 20 ? "..." : "")).replace(/\n/g, "");
+              return (next2.substr(0, 20) + (next2.length > 20 ? "..." : "")).replace(/\n/g, "");
             },
             showPosition: function showPosition() {
               var pre = this.pastInput();
               var c = new Array(pre.length + 1).join("-");
               return pre + this.upcomingInput() + "\n" + c + "^";
             },
-            next: function next() {
+            next: function next2() {
               if (this.done) {
                 return this.EOF;
               }
@@ -2165,12 +2165,12 @@
         if (i === void 0) {
           i = -1;
         }
-        var next = body[i + 1], sibling = body[i + 2];
-        if (!next) {
+        var next2 = body[i + 1], sibling = body[i + 2];
+        if (!next2) {
           return isRoot;
         }
-        if (next.type === "ContentStatement") {
-          return (sibling || !isRoot ? /^\s*?\r?\n/ : /^\s*?(\r?\n|$)/).test(next.original);
+        if (next2.type === "ContentStatement") {
+          return (sibling || !isRoot ? /^\s*?\r?\n/ : /^\s*?(\r?\n|$)/).test(next2.original);
         }
       }
       function omitRight(body, i, multiple) {
@@ -3612,18 +3612,18 @@
         var previousName = 0;
         var previousSource = 0;
         var result = "";
-        var next;
+        var next2;
         var mapping;
         var nameIdx;
         var sourceIdx;
         var mappings = this._mappings.toArray();
         for (var i = 0, len = mappings.length; i < len; i++) {
           mapping = mappings[i];
-          next = "";
+          next2 = "";
           if (mapping.generatedLine !== previousGeneratedLine) {
             previousGeneratedColumn = 0;
             while (mapping.generatedLine !== previousGeneratedLine) {
-              next += ";";
+              next2 += ";";
               previousGeneratedLine++;
             }
           } else {
@@ -3631,26 +3631,26 @@
               if (!util.compareByGeneratedPositionsInflated(mapping, mappings[i - 1])) {
                 continue;
               }
-              next += ",";
+              next2 += ",";
             }
           }
-          next += base64VLQ.encode(mapping.generatedColumn - previousGeneratedColumn);
+          next2 += base64VLQ.encode(mapping.generatedColumn - previousGeneratedColumn);
           previousGeneratedColumn = mapping.generatedColumn;
           if (mapping.source != null) {
             sourceIdx = this._sources.indexOf(mapping.source);
-            next += base64VLQ.encode(sourceIdx - previousSource);
+            next2 += base64VLQ.encode(sourceIdx - previousSource);
             previousSource = sourceIdx;
-            next += base64VLQ.encode(mapping.originalLine - 1 - previousOriginalLine);
+            next2 += base64VLQ.encode(mapping.originalLine - 1 - previousOriginalLine);
             previousOriginalLine = mapping.originalLine - 1;
-            next += base64VLQ.encode(mapping.originalColumn - previousOriginalColumn);
+            next2 += base64VLQ.encode(mapping.originalColumn - previousOriginalColumn);
             previousOriginalColumn = mapping.originalColumn;
             if (mapping.name != null) {
               nameIdx = this._names.indexOf(mapping.name);
-              next += base64VLQ.encode(nameIdx - previousName);
+              next2 += base64VLQ.encode(nameIdx - previousName);
               previousName = nameIdx;
             }
           }
-          result += next;
+          result += next2;
         }
         return result;
       };
@@ -5795,11 +5795,40 @@
 
   // ts/module/gallery.ts
   var listPhotos = null;
-  function load() {
-    return loadRessource("/www/canals5/phox/api/photos").then((data) => {
+  var navigation = {};
+  function loadPage(uri) {
+    return loadRessource(uri).then((data) => {
       listPhotos = data.photos;
+      navigation = data.links;
       return listPhotos;
     });
+  }
+  function load() {
+    return loadPage("/www/canals5/phox/api/photos");
+  }
+  function next() {
+    if (navigation && navigation.next) {
+      return loadPage(navigation.next.href);
+    }
+    return Promise.reject(new Error("No next page available"));
+  }
+  function previous() {
+    if (navigation && navigation.prev) {
+      return loadPage(navigation.prev.href);
+    }
+    return Promise.reject(new Error("No previous page available"));
+  }
+  function first() {
+    if (navigation && navigation.first) {
+      return loadPage(navigation.first.href);
+    }
+    return Promise.reject(new Error("No first page available"));
+  }
+  function last() {
+    if (navigation && navigation.last) {
+      return loadPage(navigation.last.href);
+    }
+    return Promise.reject(new Error("No last page available"));
   }
 
   // ts/module/gallery_ui.ts
@@ -5827,7 +5856,7 @@
       type: data.photo.format,
       defX: data.photo.width,
       defY: data.photo.height,
-      url: BASE_URL2 + data.photo.url.href
+      url: BASE_URL2 + data.photo.thumbnail.href
     });
     const section = document.getElementById("la_photo");
     section.innerHTML = html;
@@ -5847,6 +5876,30 @@
   }
 
   // ts/module/index.ts
+  var btnNext = document.getElementById("btn-next");
+  var btnPrevious = document.getElementById("btn-prev");
+  var btnFirst = document.getElementById("btn-first");
+  var btnLast = document.getElementById("btn-last");
+  if (btnNext) {
+    btnNext.addEventListener("click", () => {
+      next().then((galerie) => display_galerie(galerie));
+    });
+  }
+  if (btnPrevious) {
+    btnPrevious.addEventListener("click", () => {
+      previous().then((galerie) => display_galerie(galerie));
+    });
+  }
+  if (btnFirst) {
+    btnFirst.addEventListener("click", () => {
+      first().then((galerie) => display_galerie(galerie));
+    });
+  }
+  if (btnLast) {
+    btnLast.addEventListener("click", () => {
+      last().then((galerie) => display_galerie(galerie));
+    });
+  }
   function getPicture(id2) {
     loadPicture(id2).then((data) => {
       displayPicture(data);
