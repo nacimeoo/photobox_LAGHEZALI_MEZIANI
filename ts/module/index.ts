@@ -11,25 +11,25 @@ const btnLast = document.getElementById('btn-last') as HTMLButtonElement;
 
 if (btnNext) {
     btnNext.addEventListener('click', () => {
-        next().then((galerie: any) => display_galerie(galerie));
+        next().then((galerie: any) => display_galerie(galerie, getPicture));
     });
 }
 
 if (btnPrevious) {
     btnPrevious.addEventListener('click', () => {
-        previous().then((galerie: any) => display_galerie(galerie));
+        previous().then((galerie: any) => display_galerie(galerie, getPicture));
     });
 }
 
 if (btnFirst) {
     btnFirst.addEventListener('click', () => {
-        first().then((galerie: any) => display_galerie(galerie));
+        first().then((galerie: any) => display_galerie(galerie, getPicture));
     });
 }
 
 if (btnLast) {
     btnLast.addEventListener('click', () => {
-        last().then((galerie: any) => display_galerie(galerie));
+        last().then((galerie: any) => display_galerie(galerie, getPicture));
     });
 }
 
@@ -64,7 +64,7 @@ function getComments(data: Photo): Promise<any> {
 
 const btnLoad = document.getElementById('btn-load') as HTMLButtonElement;
 btnLoad.addEventListener('click', () => {
-    load().then((galerie: any) => display_galerie(galerie));
+    load().then((galerie: any) => display_galerie(galerie, getPicture));
 });
 
 

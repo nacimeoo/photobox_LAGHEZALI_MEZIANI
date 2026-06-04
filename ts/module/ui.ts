@@ -14,7 +14,7 @@ export function displayPicture(data: Photo): void {
         type: data.photo.format,
         defX: data.photo.width,
         defY: data.photo.height,
-        url: BASE_URL + data.photo.thumbnail.href,
+        url: BASE_URL + data.photo.url.href,
     });
 
     const section = document.getElementById('la_photo') as HTMLElement;

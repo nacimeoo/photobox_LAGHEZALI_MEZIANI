@@ -5833,13 +5833,16 @@
 
   // ts/module/gallery_ui.ts
   var BASE_URL = "https://webetu.iutnc.univ-lorraine.fr";
-  function display_galerie(galerie) {
+  function display_galerie(galerie, onphotoClick) {
     const section = document.getElementById("la_galerie");
     section.innerHTML = "";
     galerie.forEach((photo) => {
       const img = document.createElement("img");
       img.src = `${BASE_URL}${photo.photo.thumbnail.href}`;
       img.setAttribute("data-photoId", photo.photo.id.toString());
+      img.addEventListener("click", () => {
+        onphotoClick(photo.photo.id);
+      });
       section.appendChild(img);
     });
   }
@@ -5856,7 +5859,7 @@
       type: data.photo.format,
       defX: data.photo.width,
       defY: data.photo.height,
-      url: BASE_URL2 + data.photo.thumbnail.href
+      url: BASE_URL2 + data.photo.url.href
     });
     const section = document.getElementById("la_photo");
     section.innerHTML = html;
@@ -5882,22 +5885,22 @@
   var btnLast = document.getElementById("btn-last");
   if (btnNext) {
     btnNext.addEventListener("click", () => {
-      next().then((galerie) => display_galerie(galerie));
+      next().then((galerie) => display_galerie(galerie, getPicture));
     });
   }
   if (btnPrevious) {
     btnPrevious.addEventListener("click", () => {
-      previous().then((galerie) => display_galerie(galerie));
+      previous().then((galerie) => display_galerie(galerie, getPicture));
     });
   }
   if (btnFirst) {
     btnFirst.addEventListener("click", () => {
-      first().then((galerie) => display_galerie(galerie));
+      first().then((galerie) => display_galerie(galerie, getPicture));
     });
   }
   if (btnLast) {
     btnLast.addEventListener("click", () => {
-      last().then((galerie) => display_galerie(galerie));
+      last().then((galerie) => display_galerie(galerie, getPicture));
     });
   }
   function getPicture(id2) {
@@ -5921,7 +5924,7 @@
   }
   var btnLoad = document.getElementById("btn-load");
   btnLoad.addEventListener("click", () => {
-    load().then((galerie) => display_galerie(galerie));
+    load().then((galerie) => display_galerie(galerie, getPicture));
   });
   var hash = window.location.hash;
   var id = hash ? parseInt(hash.substring(1)) : 105;
