@@ -4,7 +4,7 @@
     "handlebars": "^4.7.9"
   },
   "scripts": {
-    "build": "esbuild ts/index.ts --bundle --sourcemap --target=es2015 --outfile=js/index.js"
+    "build": "esbuild ts/module/index.ts --bundle --sourcemap --target=es2015 --outfile=js/index.js"
   },
   "devDependencies": {
     "@types/handlebars": "^4.0.40"

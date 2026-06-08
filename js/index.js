@@ -5932,6 +5932,7 @@
   }
   function getPicture(id2) {
     loadPicture(id2).then((data) => {
+      var _a, _b, _c;
       displayPicture(data);
       const sectionGalerie = document.getElementById("la_galerie");
       const sectionPhoto = document.getElementById("la_photo");
@@ -5942,7 +5943,7 @@
         sectionPhoto.style.display = "block";
       if (navigationButtons)
         navigationButtons.style.display = "none";
-      document.getElementById("close-lightbox")?.addEventListener(
+      (_a = document.getElementById("close-lightbox")) == null ? void 0 : _a.addEventListener(
         "click",
         () => {
           if (sectionGalerie)
@@ -5953,13 +5954,13 @@
             navigationButtons.style.display = "block";
         }
       );
-      document.getElementById("next-lightbox")?.addEventListener("click", () => {
+      (_b = document.getElementById("next-lightbox")) == null ? void 0 : _b.addEventListener("click", () => {
         const nextId = getNextPhoto(data.photo.id);
         if (nextId !== null) {
           getPicture(nextId);
         }
       });
-      document.getElementById("prev-lightbox")?.addEventListener("click", () => {
+      (_c = document.getElementById("prev-lightbox")) == null ? void 0 : _c.addEventListener("click", () => {
         const prevId = getPreviousPhoto(data.photo.id);
         if (prevId !== null) {
           getPicture(prevId);
@@ -5988,3 +5989,4 @@
   var id = hash ? parseInt(hash.substring(1)) : 105;
   getPicture(id);
 })();
+//# sourceMappingURL=index.js.map
